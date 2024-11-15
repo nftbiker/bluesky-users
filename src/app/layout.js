@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Bluesky User Search',
-  description: 'Search for Bluesky users',
+  title: 'Bluesky artbots search',
+  description: 'Search for Bluesky arbots made by @botfrens',
 }
 
 export default function RootLayout({ children }) {
