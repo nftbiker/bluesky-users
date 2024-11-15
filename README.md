@@ -3,6 +3,8 @@
 This app allow to search users on bluesky.
 The aim is to find easily all botfrens account to follow artwork dedicated accounts.
 
+This app was fully built with Claude 3.5 Sonnet in less than 15 minutes !
+
 ## Getting Started
 
 First, run the development server:
