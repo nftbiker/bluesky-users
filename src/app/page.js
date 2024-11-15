@@ -86,7 +86,7 @@ export default function SearchApp() {
             <button
               key={index}
               onClick={() => doPredefinedSearch(search.text)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+              className="px-4 py-2 bg-black text-white rounded-full hover:bg-black transition-colors"
             >
               {search.label}
             </button>
