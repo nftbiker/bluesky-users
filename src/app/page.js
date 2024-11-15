@@ -1,101 +1,180 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from 'react';
+import { Search, ExternalLink } from 'lucide-react';
+
+export default function SearchApp() {
+  const [query, setQuery] = useState("automated @andreitr.bsky.social");
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [cursor, setCursor] = useState('');
+  const [hasMore, setHasMore] = useState(false);
+
+  const predefinedSearches = [
+    { text: "automated @andreitr.bsky.social", label: "@anderitr" },
+    { text: "automated @botfrens.bsky.social", label: "@botfrens" },
+    { text: "automated #artbot", label: "Automated artbot" },
+  ];
+
+  const doPredefinedSearch = async (q) => {
+    setResults([]);
+    setCursor('');
+    setQuery(q);
+    searchBluesky(q);
+  }
+
+  const searchBluesky = async (searchQuery, searchCursor = '') => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        q: searchQuery,
+        limit: '100',
+        cursor: searchCursor,
+      }).toString();
+
+      const response = await fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.searchActors?${params}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      const data = await response.json();
+
+      if (searchCursor === '') {
+        setResults(data.actors);
+      } else {
+        setResults(prev => [...prev, ...data.actors]);
+      }
+
+      setCursor(data.cursor);
+      setHasMore(data.actors.length === 100);
+    } catch (error) {
+      console.error('Error during search:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (query.trim()) {
+      setResults([]);
+      setCursor('');
+      searchBluesky(query);
+    }
+  };
+
+  const loadMore = () => {
+    if (cursor && !loading) {
+      searchBluesky(query, cursor);
+    }
+  };
+
+  const getProfileUrl = (handle) => {
+    return `https://bsky.app/profile/${handle}`;
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-gray-50 p-8">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+          Bluesky Artbot Search
+        </h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        <div className="mb-4 flex flex-wrap gap-2">
+          {predefinedSearches.map((search, index) => (
+            <button
+              key={index}
+              onClick={() => doPredefinedSearch(search.text)}
+              className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
+            >
+              {search.label}
+            </button>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+
+        <form onSubmit={handleSearch} className="mb-8">
+          <div className="relative">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search for a user..."
+              className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+            />
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+            >
+              <Search className="w-5 h-5 text-gray-500 hover:text-blue-500 transition-colors" />
+            </button>
+          </div>
+        </form>
+
+        {loading && (
+          <div className="flex justify-center my-8">
+            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+
+        <div className="space-y-4">
+          {results.map((user, index) => (
+            <div
+              key={`${user.did}-${index}`}
+              className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center gap-4">
+                {user.avatar && (
+                  <img
+                    src={user.avatar}
+                    alt={user.displayName}
+                    className="w-12 h-12 rounded-full"
+                  />
+                )}
+                <div className="flex-grow">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-gray-900">
+                      {user.displayName || user.handle}
+                    </h3>
+                    <a
+                      href={getProfileUrl(user.handle)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-blue-500 hover:text-blue-600 transition-colors"
+                    >
+                      View profile
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                  <p className="text-gray-500">@{user.handle}</p>
+                  {user.description && (
+                    <p className="text-gray-600 mt-2">{user.description}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {hasMore && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={loadMore}
+              disabled={loading}
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition-colors"
+            >
+              Load more
+            </button>
+          </div>
+        )}
+
+        {results.length > 0 && (
+          <p className="text-center text-gray-500 mt-4">
+            {results.length} results displayed
+          </p>
+        )}
+      </div>
     </div>
   );
 }
