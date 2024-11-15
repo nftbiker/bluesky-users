@@ -135,13 +135,19 @@ export default function SearchApp() {
                 <div className="flex-grow">
                   <div className="flex items-center justify-between">
                     <h3 className="font-medium text-gray-900">
-                      {user.displayName || user.handle}
+                      <a
+                        href={getProfileUrl(user.handle)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {user.displayName || user.handle}
+                      </a>
                     </h3>
                     <a
                       href={getProfileUrl(user.handle)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-blue-500 hover:text-blue-600 transition-colors"
+                      className="flex items-center gap-1 transition-colors"
                     >
                       View profile
                       <ExternalLink className="w-4 h-4" />
