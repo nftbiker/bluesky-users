@@ -4,15 +4,15 @@ import { useState } from 'react';
 import { Search, ExternalLink } from 'lucide-react';
 
 export default function SearchApp() {
-  const [query, setQuery] = useState("automated @andreitr.bsky.social");
+  const [query, setQuery] = useState("@andreitr.bsky.social");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [cursor, setCursor] = useState('');
   const [hasMore, setHasMore] = useState(false);
 
   const predefinedSearches = [
-    { text: "automated @andreitr.bsky.social", label: "@anderitr" },
-    { text: "automated @botfrens.bsky.social", label: "@botfrens" },
+    { text: "@andreitr.bsky.social", label: "@anderitr" },
+    { text: "@botfrens.bsky.social", label: "@botfrens" },
     { text: "automated #artbot", label: "Automated artbot" },
   ];
 
