@@ -9,6 +9,7 @@ export default function SearchApp() {
   const [cursor, setCursor] = useState('');
   const [loading, setLoading] = useState();
   const [hasMore, setHasMore] = useState();
+  const [automaticLoad, setAutomaticLoad] = useState();
 
   const predefinedSearches = [
     { text: "@andreitr.bsky.social", label: "@anderitr" },
@@ -17,6 +18,12 @@ export default function SearchApp() {
   ];
 
   useEffect(() => {
+    let nb = automaticLoad || 1
+    // automatically load at most 10 pages
+    if (nb >= 10) return;
+
+    nb += 1
+    setAutomaticLoad(nb);
     loadMore()
   }, [loading, hasMore, cursor])
 
