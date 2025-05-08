@@ -1,20 +1,29 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, ExternalLink } from 'lucide-react';
 
 export default function SearchApp() {
   const [query, setQuery] = useState("@andreitr.bsky.social");
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [cursor, setCursor] = useState('');
-  const [hasMore, setHasMore] = useState(false);
+  const [loading, setLoading] = useState();
+  const [hasMore, setHasMore] = useState();
 
   const predefinedSearches = [
     { text: "@andreitr.bsky.social", label: "@anderitr" },
     { text: "@botfrens.bsky.social", label: "@botfrens" },
     { text: "automated #artbot", label: "Automated artbot" },
   ];
+
+  useEffect(() => {
+    loadMore()
+  }, [loading, hasMore, cursor])
+
+
+  const formattedDate = (date) => {
+    return date.toISOString().split('T')[0];
+  }
 
   const doPredefinedSearch = async (q) => {
     setResults([]);
@@ -40,17 +49,21 @@ export default function SearchApp() {
       });
       const data = await response.json();
 
-      if (searchCursor === '') {
-        setResults(data.actors);
-      } else {
-        setResults(prev => [...prev, ...data.actors]);
+      let list = (searchCursor === '' ? [] : results)
+      for (let a of data.actors) {
+        let actor = Object.assign({}, a);
+        actor.createdAt = new Date(a.createdAt)
+        actor.timestamp = actor.createdAt.getTime()
+        list.push(actor)
       }
 
+      list.sort((a, b) => b.timestamp - a.timestamp)
+      setResults(list);
+      setLoading(false);
+      setHasMore(data.actors.length === 100)
       setCursor(data.cursor);
-      setHasMore(data.actors.length === 100);
     } catch (error) {
       console.error('Error during search:', error);
-    } finally {
       setLoading(false);
     }
   };
@@ -65,7 +78,7 @@ export default function SearchApp() {
   };
 
   const loadMore = () => {
-    if (cursor && !loading) {
+    if (cursor && hasMore && !loading) {
       searchBluesky(query, cursor);
     }
   };
@@ -153,7 +166,11 @@ export default function SearchApp() {
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
-                  <p className="text-gray-500">@{user.handle}</p>
+                  <p className="text-gray-500">
+                    @{user.handle}
+                    &nbsp;&bull;&nbsp;
+                    {formattedDate(user.createdAt)}
+                  </p>
                   {user.description && (
                     <p className="text-gray-600 mt-2">{user.description}</p>
                   )}
