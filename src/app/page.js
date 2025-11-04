@@ -12,8 +12,8 @@ export default function SearchApp() {
   const [automaticLoad, setAutomaticLoad] = useState();
 
   const predefinedSearches = [
-    { text: "@andreitr.bsky.social", label: "@anderitr" },
     { text: "@botfrens.bsky.social", label: "@botfrens" },
+    { text: "@nuwaves-future.bsky.social", label: "@nuwaves-future" },
     { text: "automated #artbot", label: "Automated artbot" },
   ];
 
