@@ -16,6 +16,7 @@ export default function SearchApp() {
     { text: "@botfrens.bsky.social", label: "@botfrens" },
     { text: "#artbots by", label: "Artbots by" },
     { text: "automated #artbot", label: "Automated artbot" },
+    { text: "#artbots", label: "#artbots" },
   ];
 
   useEffect(() => {
